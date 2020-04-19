@@ -15,30 +15,30 @@ lcd.begin(16,2);
  
 void loop(){
     while(gpsSerial.available()){ // check for gps data
-      if(gps.encode(gpsSerial.read()))// encode gps data
-      { 
-       gps.f_get_position(&lat,&lon); // get latitude and longitude
-       // display position
-        lcd.clear();
-        lcd.setCursor(1,0);
-        lcd.print("GPS Signal");
-        //Serial.print("Position: ");
-        //Serial.print("Latitude:");
-       //Serial.print(lat,6);
-        //Serial.print(";");
-        //Serial.print("Longitude:");
-        //Serial.println(lon,6); 
-        lcd.setCursor(1,0);
-        lcd.print("LAT:");
-        lcd.setCursor(5,0);
-        lcd.print(lat);
-       //Serial.print(lat);
-       //Serial.print(" ");
+    if(gps.encode(gpsSerial.read()))// encode gps data
+    { 
+    gps.f_get_position(&lat,&lon); // get latitude and longitude
+    // display position
+    lcd.clear();
+    lcd.setCursor(1,0);
+    lcd.print("GPS Signal");
+    //Serial.print("Position: ");
+    //Serial.print("Latitude:");
+    //Serial.print(lat,6);
+    //Serial.print(";");
+    //Serial.print("Longitude:");
+    //Serial.println(lon,6); 
+    lcd.setCursor(1,0);
+    lcd.print("LAT:");
+    lcd.setCursor(5,0);
+    lcd.print(lat);
+    //Serial.print(lat);
+    //Serial.print(" ");
     
-       lcd.setCursor(0,1);
-       lcd.print(",LON:");
-       lcd.setCursor(5,1);
-       lcd.print(lon);
+    lcd.setCursor(0,1);
+    lcd.print(",LON:");
+    lcd.setCursor(5,1);
+    lcd.print(lon);
     
    }
   }

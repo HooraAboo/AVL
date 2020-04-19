@@ -1,6 +1,6 @@
 String input = "";
-bool string_is_complete = false;
-String header = "GPRMC";
+boolean string_is_complete = false;
+String signal = "GPRMC";
 
 void setup() {
   Serial.begin(9600);
@@ -8,51 +8,65 @@ void setup() {
 }
 
 void loop() {
-  if(!string_is_complete) {
-    Serial.println("kir");
-    if(input.substring(1,6) == header) {
+  while(string_is_complete) {
+    if(input.substring(1,6) == signal) {
       //UTC Time
       String hour = input.substring(7,9);
       String minute = input.substring(9,11);
       String second = input.substring(11,13);
-      Serial.println("UTC Time: " + hour + ":" + minute + ":" + second);
 
       // Status, V: Navigation reciever warning; A: Data valid
-      String status = input.substring(14,15);
+      String status = input.substring(17,18);
 
       // Latitude
       ///// to do: remove first 0
-      String lat_deg = input.substring(16,18);
-      String lat = input.substring(18,26);
-      String lat_dir = input.substring(27,28);
+      String lat_deg = input.substring(19,21);
+      String lat = input.substring(21,29);
+      String lat_dir = input.substring(20,31);
       ///// to do: func for convert n to north
-      Serial.println(lat_deg + "," + lat + "'" + lat_dir);
 
       // Longitude
       ///// to do: remove first 0
-      String lon_deg = input.substring(29,31);
-      String lon = input.substring(31,40);
-      String lon_dir = input.substring(41,42);
+      String lon_deg = input.substring(32,34);
+      String lon = input.substring(34,43);
+      String lon_dir = input.substring(44,45);
       ///// to do: func for convert n to north
-      Serial.println(lat_deg + "," + lat + "'" + lat_dir);
 
       // Speed over Ground in Knots
-      String SOG = input.substring(43,48);
+      String SOG = input.substring(46,451);
 
       // Course over ground in degrees
       String COG = input.substring(49,54);
 
       //Date
-      String day = input.substring(55,57);
-      String month = input.substring(57,59);
-      String year = input.substring(59,60);
-      Serial.println(day + "/" + month + "/" + "20" + year);
+      String day = input.substring(53,55);
+      String month = input.substring(55,57);
+      String year = input.substring(57,59);
 
       // Mode Indicator, N: No Fix; A: Autonomous GNSS Fix; D: Differential GNSS Fix; E = Estimated/Dead Reckoning Fix
-      String mode = input.substring(63,64);
+      String mode = input.substring(62,63);
 
       // Checksum
-      String CS = input.substring(65,67);
+      String CS = input.substring(64,66);
+
+      // Print Data
+      Serial.println(day + "/" + month + "/" + year);
+      Serial.println("UTC Time" + hour + ":" + minute + ":" + second);
+      Serial.println(lat_deg + "," + lat + "'" + lat_dir);
+      Serial.println(lon_deg + "," + lon + "'" + lon_dir);
+    }
+    
+    input = "";
+    string_is_complete = false;
+  }
+}
+
+void serialEvent() {
+  while(Serial.available()) {
+    char inChar = (char) Serial.read();
+    input += inChar;
+    if(inChar == '\n') {
+      string_is_complete = true;
     }
   }
 }
