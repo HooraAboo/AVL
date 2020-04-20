@@ -1,15 +1,37 @@
+#include <SPI.h>
+#include <SD.h>
+
 String input = "";
 boolean string_is_complete = false;
-String signal = "GPRMC";
+String header = "GPRMC";
+
+File log_file;
 
 void setup() {
   Serial.begin(9600);
+  while(!Serial);
+  
   input.reserve(200);
+
+  Serial.println("Initializing SD card...");
+  if (!SD.begin(10)) {
+    Serial.println("Initialization Failed!");
+    while(1);
+  }
+  Serial.println("Initialization Completed.");
+  log_file = SD.open("log.txt", FILE_WRITE);
+  if(log_file) {
+    log_file.close();
+    Serial.println("done.");
+
+  } else {
+    Serial.println("error opening test.txt");
+  }
 }
 
 void loop() {
   while(string_is_complete) {
-    if(input.substring(1,6) == signal) {
+    if(input.substring(1,6) == header) {
       //UTC Time
       String hour = input.substring(7,9);
       String minute = input.substring(9,11);
@@ -22,7 +44,7 @@ void loop() {
       ///// to do: remove first 0
       String lat_deg = input.substring(19,21);
       String lat = input.substring(21,29);
-      String lat_dir = input.substring(20,31);
+      String lat_dir = input.substring(30,31);
       ///// to do: func for convert n to north
 
       // Longitude
@@ -51,14 +73,19 @@ void loop() {
 
       // Print Data
       Serial.println(day + "/" + month + "/" + year);
-      Serial.println("UTC Time" + hour + ":" + minute + ":" + second);
-      Serial.println(lat_deg + "," + lat + "'" + lat_dir);
-      Serial.println(lon_deg + "," + lon + "'" + lon_dir);
+      Serial.println("UTC Time: " + hour + ":" + minute + ":" + second);
+      Serial.println(lat_deg + " deg, " + lat + "'" + lat_dir);
+      Serial.println(lon_deg + " deg, " + lon + "'" + lon_dir);
     }
+
+    log_file = SD.open("log.txt", FILE_WRITE);
+    log_file.print(input);
+    log_file.close();
     
     input = "";
     string_is_complete = false;
   }
+  
 }
 
 void serialEvent() {

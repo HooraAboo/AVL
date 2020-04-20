@@ -14,9 +14,9 @@ while (1);
 }
 Serial.println("initialization done.");
 // open the file for reading:
-myFile = SD.open("test.txt");
+myFile = SD.open("log1.txt");
 if (myFile) {
-Serial.println("test.txt:");
+Serial.println("log1.txt:");
 // read from the file until there's nothing else in it:
 while (myFile.available()) {
 Serial.write(myFile.read());
@@ -25,7 +25,7 @@ Serial.write(myFile.read());
 myFile.close();
 } else {
 // if the file didn't open, print an error:
-Serial.println("error opening test.txt");
+Serial.println("error opening log.txt");
 }
 }
 void loop() {
