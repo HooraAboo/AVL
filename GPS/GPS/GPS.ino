@@ -1,4 +1,4 @@
-#include <SPI.h>
+//#include <SPI.h>
 #include <SD.h>
 
 String input = "";
@@ -14,7 +14,7 @@ void setup() {
   input.reserve(200);
 
   Serial.println("Initializing SD card...");
-  if (!SD.begin(10)) {
+  if(!SD.begin(10)) {
     Serial.println("Initialization Failed!");
     while(1);
   }

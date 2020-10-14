@@ -1,0 +1,22 @@
+Regular Expression
+
+AT
+
+OK
+
+
+AT+CREG?
+
++CREG: 0,0
+
+
+AT+CSQ
+
++CSQ: 0,0
+
+OK
+
+
+AT+CIPSHUT
+
+SHUT OK
