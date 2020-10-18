@@ -1,12 +1,16 @@
-#include <SPI.h>
+//#include <SPI.h>
 #include <SD.h>
+
 
 #define NMEA "NMEA.txt"
 #define GPS_Data "Data.txt"
+#define signal_header  "GPRMC"
+#define cspin 10
 
 String input = "";
 boolean string_is_complete = false;
-String header = "GPRMC";
+long latitude;
+long longitude;
 
 File log_file;
 
@@ -17,7 +21,7 @@ void setup() {
   input.reserve(200);
 
   Serial.println("Initializing SD card...");
-  if (!SD.begin(10)) {
+  if (!SD.begin(cspin)) {
     Serial.println("Initialization Failed!");
     delay(5000);
   }
@@ -30,12 +34,16 @@ void setup() {
   log_file = SD.open(GPS_Data, FILE_WRITE);
   log_file.println("<------------------------- New Session ------------------------->");
   log_file.close();
+
+  //warmup_gsm();
+  //connect_tcp();
 }
 
 void loop() {
   while(string_is_complete) {
-    if(input.substring(1,6) == header) {
+    if(input.substring(1,6) == signal_header) {
       parse_nmea();
+      //send_to_server();
     }
 
     log_file = SD.open(NMEA, FILE_WRITE);
@@ -59,6 +67,20 @@ void serialEvent() {
 }
 
 void parse_nmea() {
+  /*String temp1 = input.substring(53,59);
+  String temp2 = input.substring(7,13);
+  strcmp(time, temp1);
+  strcat(time, temp2);
+  Serial.println(time);*/
+  
+  latitude = input.substring(19,29).toFloat()*100000;
+  longitude = input.substring(32,43).toFloat()*100000;
+
+  Serial.println(latitude);   //## ##.#####
+  Serial.println(longitude);  //### ##.#####
+}
+
+void parse_nmea_detail() {
   //UTC Time
   String hour = input.substring(7,9);
   String minute = input.substring(9,11);
@@ -68,18 +90,14 @@ void parse_nmea() {
   String status = input.substring(17,18);
 
   // Latitude
-  ///// to do: remove first 0
   String lat_deg = input.substring(19,21);
   String lat = input.substring(21,29);
   String lat_dir = input.substring(30,31);
-  ///// to do: func for convert n to north
-
+ 
   // Longitude
-  ///// to do: remove first 0
-  String lon_deg = input.substring(32,34);
-  String lon = input.substring(34,43);
+  String lon_deg = input.substring(32,35);
+  String lon = input.substring(35,43);
   String lon_dir = input.substring(44,45);
-  ///// to do: func for convert n to north
 
   // Speed over Ground in Knots
   String SOG = input.substring(46,451);
@@ -107,7 +125,7 @@ void parse_nmea() {
   log_file = SD.open(GPS_Data, FILE_WRITE);
   log_file.print(year + "/" + month + "/" + day);
   log_file.print(" UTC Time: " + hour + ":" + minute + ":" + second);
-  log_file.print(lat_deg + " deg, " + lat + "'" + lat_dir);
-  log_file.println(lon_deg + " deg, " + lon + "'" + lon_dir);
+  log_file.print(lat_deg + " deg, " + latitude + "'" + lat_dir);
+  log_file.println(lon_deg + " deg, " + longitude + "'" + lon_dir);
   log_file.close();
 }
